@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebClient.Models;
 
 namespace WebClient.Services
 {
-    interface IWeatherService
+    public interface IWeatherService
     {
+        Task<IEnumerable<WeatherModel>> GetWeather();
+
     }
 }
