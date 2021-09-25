@@ -27,37 +27,65 @@ namespace WebClient
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddHttpClient<IWeatherService, WeatherService>(c =>
-                c.BaseAddress = new Uri(Configuration["ApiSettings:AnyAPI"]));
+            registerServices(services);
 
-
-            #region Authentication
-            services.AddAuthentication(option =>
-            {
-                option.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                option.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                option.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-
-            }).AddJwtBearer(options =>
-            {
-                options.RequireHttpsMetadata = false;
-                options.SaveToken = true;
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = Configuration["Jwt:Issuer"],
-                    ValidAudience = Configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
-                };
-            }).AddCookie();
-
-            #endregion
+            addAuthencation(services);
 
             services.AddRazorPages();
 
+        }
+
+        private void addAuthencation(IServiceCollection services)
+        {
+
+            services.AddAuthentication("CookieAuthentication")
+                 .AddCookie("CookieAuthentication", config =>
+                 {
+                     config.Cookie.Name = "UserLoginCookie";
+                     config.LoginPath = "/Account/Login";
+                 });
+
+            services.AddControllersWithViews();
+
+            #region Authentication
+            //services.AddAuthentication(option =>
+            //{
+            //    option.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //    option.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //    option.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
+            //}).AddJwtBearer(options =>
+            //{
+            //    options.RequireHttpsMetadata = false;
+            //    options.SaveToken = true;
+            //    options.TokenValidationParameters = new TokenValidationParameters
+            //    {
+            //        ValidateIssuer = true,
+            //        ValidateAudience = true,
+            //        ValidateLifetime = true,
+            //        ValidateIssuerSigningKey = true,
+            //        ValidIssuer = Configuration["Jwt:Issuer"],
+            //        ValidAudience = Configuration["Jwt:Audience"],
+            //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+            //    };
+            //}).AddCookie(options =>
+            //{
+            //    options.AccessDeniedPath = "/Views/Shared/Error";
+            //    options.LoginPath = "/Account/Login";
+            //    options.LogoutPath = "/Account/Logout";
+            //    options.SlidingExpiration = true;
+            //});
+
+            #endregion
+        }
+
+        private void registerServices(IServiceCollection services)
+        {
+            services.AddHttpClient<IWeatherService, WeatherService>(c =>
+                c.BaseAddress = new Uri(Configuration["ApiSettings:AnyAPI"]));
+
+            services.AddHttpClient<IUserService, UserService>(c =>
+                c.BaseAddress = new Uri(Configuration["ApiSettings:JWTAuthencation"]));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
