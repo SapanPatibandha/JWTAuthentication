@@ -5,7 +5,7 @@ using WebClient.Services;
 
 namespace WebClient.Controllers
 {
-    public class WeatherController : Controller
+    public class WeatherController : ControlerBase
     {
         private readonly IWeatherService _weatherService;
 
